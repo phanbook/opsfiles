@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -yqq \
 #
 
 ENV  DEBIAN_FRONTEND noninteractive
-ENV  MYSQL_PASSWORD phanbook
+ENV  MYSQL_PASSWORD password__phanbook
 ENV  DB_NAME phanbook
 ENV  ROOT_DIR /usr/share/nginx/html/www/
 # Copy site into place.
