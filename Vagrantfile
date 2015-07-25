@@ -18,9 +18,9 @@ VAGRANTFILE_API_VERSION = "2"
 #Check if you have the good Vagrant version to use docker provider...
 Vagrant.require_version ">= 1.6.0"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    config.vm.define "ubuntu", autostart: false
-    config.vm.define "centos", autostart: true
-    config.vm.synced_folder "../", "/usr/share/nginx/html/www", \
+    config.vm.define "ubuntu", autostart: true
+    config.vm.define "centos", autostart: false
+    config.vm.synced_folder ".", "/usr/share/nginx/html/www", \
       :create         => true, \
       :owner          => 'vagrant', \
       :group          => 'vagrant', \
@@ -36,7 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         web.vm.provision "shell", path: "scripts/ubuntu/nginx.sh"
         web.vm.provision "shell", path: "scripts/ubuntu/php.sh"
         web.vm.provision "shell", path: "scripts/ubuntu/phalcon.sh"
-        web.vm.provision "shell", path: "scripts/ubuntu/app.sh"
+        web.vm.provision "shell", path: "scripts/app.sh"
 
     end
 
