@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         web.vm.provision "shell", path: "scripts/ubuntu/nginx.sh"
         web.vm.provision "shell", path: "scripts/ubuntu/php.sh"
         web.vm.provision "shell", path: "scripts/ubuntu/phalcon.sh"
+        web.vm.provision "shell", path: "scripts/ubuntu/elastic.sh"
         web.vm.provision "shell", path: "scripts/app.sh"
 
     end
