@@ -24,4 +24,6 @@ fi
 #sed -i "s/'host'     => 'db'/'host'     => 'localhost'/" core/config/config.vagrant.php
 
 chmod 777 -R content/
+chmod 777 -R public/
+
 
