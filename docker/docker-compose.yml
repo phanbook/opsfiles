@@ -1,30 +1,66 @@
-web:
-  image: phanbook/nginx
-  ports:
-    - "80:80"
-  volumes:
-    - ./:/var/www/html
-    - ./opsfiles/docker/templates/phanbook.conf:/etc/nginx/sites-enabled/default
-  links:
-    - php
-php:
-  image: phanbook/php
-  volumes:
-    - ./opsfiles/docker/templates/php-fpm.conf:/etc/php5/fpm/php-fpm.conf
-    - ./:/var/www/html
-  links:
-    - db
-app:
-  image: phanbook/app
-  working_dir: /var/www/html
-  volumes:
-    - ./:/var/www/html
-db:
-  image: phanbook/mysql
-  #volumes:
-  #  - /opt/mysql/data:/var/lib/mysql
-  #environment:
-  #  - MYSQL_DB=phanbook
-  #  - MYSQL_PASS=phanbook
-  #  - MYSQL_USER=phanbook
-  env_file: ./opsfiles/docker/config.env
+version: '2'
+
+services:
+    mysql:
+        image: mysql
+        restart: always
+        env_file:
+           - .env
+        container_name: mysql_phanbook
+    nginx:
+        depends_on:
+            - phpfpm
+        image: nginx
+        ports:
+            - "80:80"
+        restart: always
+        working_dir: /var/www/phanbook
+        volumes:
+            - ../../:/var/www/phanbook
+            - ./conf/nginx/phanbook.conf:/etc/nginx/conf.d/default.conf
+        links:
+            - phpfpm
+        container_name: nginx_phanbook
+
+    phpfpm:
+        image: phalconphp/php-apache:ubuntu-16.04
+        restart: always
+        working_dir: /var/www/phanbook
+        ports:
+            - "8080:80"
+            - "9002:9000"
+        volumes:
+            - ../../:/var/www/phanbook
+            - ./conf/php/php.ini:/opt/docker/etc/php/php.ini
+        depends_on:
+            - mysql
+        container_name: phpfpm_phanbook
+
+    phpmyadmin:
+        restart: always
+        image: phpmyadmin/phpmyadmin:4.6
+        depends_on:
+          - mysql
+        ports:
+          - "9090:80"
+        env_file:
+            - .env
+
+    composer:
+        restart: 'no'
+        image: phalconphp/composer
+        command: install --no-dev
+        working_dir: /var/www/phanbook
+        volumes:
+            - ../../:/var/www/phanbook
+    migrate:
+        image: dhoer/flyway
+        restart: 'no'
+        working_dir: /flyway/sql
+        volumes:
+            - ../../schema:/flyway/sql
+        #command: -url=jdbc:mysql://mysql -schemas=foxoms_2 -user=root -password=secret migrate
+        command:  -url=jdbc:mysql://mysql -schemas=${MYSQL_DATABASE} -user=root -password=${MYSQL_ROOT_PASSWORD} migrate
+
+        depends_on:
+            - mysql
